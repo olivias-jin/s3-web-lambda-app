@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload</title>
+</head>
+<body>
+
+    <h1>Interact with S3 Bucket</h1>
+    <h2>Upload an Image to S3</h2>
+
+    <!-- 이미지 업로드 폼 -->
+    <form id="uploadForm" enctype="multipart/form-data">
+        <input type="file" name="image" id="image" required/>
+        <button type="submit">Upload File</button>
+    </form>
+
+    <div id="message"></div>
+
+    <h2>S3 List</h2>
+    <ul id="imageList"></ul>
+
+    <script>
+        // 이미지 업로드 처리
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const fileInput = document.getElementById('image');
+            if (!fileInput.files.length) {
+                document.getElementById('message').textContent = "Please select an Image";
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('image', fileInput.files[0]);
+
+            try {
+                console.log("Uploading file...");
+                const response = await fetch('http://localhost:3001/images', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                const text = await response.text();
+                console.log("Server response: ", text);
+
+                let result;
+
+                try {
+                    result = JSON.parse(text);
+                } catch (err) {
+                    throw new Error("The server response is not in JSON format: " + text);
+                }
+
+                if (response.ok) {
+                    document.getElementById('message').textContent = "Upload Successful";
+                    console.log("Upload success:", result);
+                    loadImage(); // 이미지 목록 로드
+                } else {
+                    document.getElementById('message').textContent = "Upload failed: " + result.error;
+                }
+
+            } catch (error) {
+                document.getElementById("message").textContent = "Error uploading file: " + error.message;
+                console.error(error);
+            }
+        });
+
+        // 이미지 목록 가져오기
+        async function loadImage() {
+            try {
+                console.log("Fetching image list...");
+                const response = await fetch('http://localhost:3001/images');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                console.log("List from the server: ", data);
+
+                const imageList = document.getElementById('imageList');
+                imageList.innerHTML = '';
+
+                data.files.forEach((file) => {
+                    console.log("Image URL:", file.Url); // URL 로그 확인
+
+                    const li = document.createElement('li');
+                    li.textContent = file.Key;
+
+                    const img = document.createElement('img');
+                    img.src = file.Url;
+                    img.alt = file.Key;
+                    img.width = 100;
+                    img.height = 100;
+
+                    // 다운로드 버튼 추가
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.textContent = "Download";
+                    downloadBtn.onclick = () => downloadFile(file.Key);
+
+                    li.appendChild(img);
+                    li.appendChild(downloadBtn); // 버튼을 리스트 항목에 추가
+                    imageList.appendChild(li);
+                });
+
+            
+            } catch (error) {
+                console.error('Error loading images:', error);
+            }
+        }
+
+        // 다운로드 버튼 클릭 시 파일 다운로드 처리
+        function downloadFile(filename) {
+            const downloadUrl = `http://mytask-2.6.s3-website-us-east-1.amazonaws.com/original-images/${filename}`;
+            
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = filename;  // 파일명으로 다운로드
+            link.click();
+            alert(`Downloading file: ${filename}`);
+        }
+
+        // 페이지 로딩 시 이미지 목록 불러오기
+        document.addEventListener("DOMContentLoaded", loadImage);
+
+    </script>
+</body>
+</html>
