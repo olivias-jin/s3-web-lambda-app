@@ -56,7 +56,8 @@ Lambda Console → Configuration → Permissions → "Execution Role" → Naviga
 
 Create a new policy to grants read and write access to the S3 bucket.
 
-```{
+```
+{
 	"Version": "2012-10-17",
 	"Statement": [
 		{
@@ -74,7 +75,8 @@ Create a new policy to grants read and write access to the S3 bucket.
 			]
 		}
 	]
-}```
+}
+```
 
 Add created permissions in the Roles. SAVE
 
