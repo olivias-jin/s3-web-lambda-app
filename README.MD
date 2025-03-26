@@ -10,7 +10,7 @@ npm install aws-sdk
 npm install --arch=x64 --platform=linux sharp
 ```
 
-### Create S3 Bucket:
+## Create S3 Bucket:
 
 1. AWS Console → S3
 2. Create New Bucket
@@ -20,7 +20,7 @@ npm install --arch=x64 --platform=linux sharp
 
 
 
-### Create Lambda function:
+## Create Lambda function:
 
 1. AWS Console → Lambda
 2. Create New Lambda
@@ -44,13 +44,13 @@ Window
 
 - AWS Console → Code → Upload → select function.zip
 
-### Add S3 event trigger
+## Add S3 event trigger
 
 Lambda Console → Add Trigger → Select S3
 
 Select Bucket → Event types = All Object Create Events → Prefix → Add
 
-### Execution Role
+## Execution Role
 
 Lambda Console → Configuration → Permissions → "Execution Role" → Navigate to the IAM
 
@@ -84,14 +84,14 @@ Add created permissions in the Roles. SAVE
 이벤트 유형: PUT (새 파일 업로드 시 실행)
 3️⃣ 저장 후 Lambda 배포
 
-### Test
+## Test
 
 1. Upload the image to S3
 2. When Lambda executes, the resized image will be stored in the resized-images/ folder
 3. Check the result in S3 🚀
 
 
-### Source:
+## Source:
 
 Lambda Offical Document:
 https://docs.aws.amazon.com/lambda/latest/dg/welcome.html
